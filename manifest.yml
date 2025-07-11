@@ -1,0 +1,10 @@
+---
+name: "Ollama + Jupyter"
+category: Interactive Apps
+subcategory: AI
+role: batch_connect
+description: |
+  This app will launch [ollama](https://ollama.com/) using [Jupyter Notebook] on [Tufts HPC] cluster.
+
+  [Jupyter Notebook]: https://jupyter.org/
+  [Tufts HPC]: https://it.tufts.edu/high-performance-computing

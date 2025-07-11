@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Unset potential conflicts
+unset XDG_RUNTIME_DIR
+
+
+# ================================
+# Start of Script
+# ================================
+echo "TIMING - Starting main script at: $(date)"
+
+if [[ -n "<%= context.working_directory %>" ]]; then
+  cd "<%= context.working_directory %>" || {
+    echo "❌ Failed to change to working directory: <%= context.working_directory %>"
+    exit 1
+  }
+else
+  cd "$HOME" || {
+    echo "❌ Failed to change to HOME directory: $HOME"
+    exit 1
+  }
+fi
+
+# Load modules
+module purge
+module load miniforge/24.7.1-py312
+module load singularity
+
+# Find and export Ollama port
+OLLAMA_PORT=$(find_port)
+
+export OLLAMA_HOST="127.0.0.1:${OLLAMA_PORT}"
+export OLLAMA_MODELS="<%= context.modeldir %>"
+
+echo "OLLAMA_PORT: $OLLAMA_PORT"
+echo "📡 OLLAMA_HOST: $OLLAMA_HOST"
+echo "📁 OLLAMA_MODELS: $OLLAMA_MODELS"
+
+# Image and version
+IMAGEDIR="/cluster/tufts/ngc/images"
+VER="<%= context.version %>"
+OLLAMA_SIF="${IMAGEDIR}/ollama_${VER}.sif"
+
+singularity run \
+    --nv \
+    --env "OLLAMA_HOST=$OLLAMA_HOST" \
+    --env "OLLAMA_MODELS=$OLLAMA_MODELS" \
+    "$OLLAMA_SIF" &
+    
+
+# Capture logs
+capture_in_instance_logs () {
+  local regex=$1
+  local info="$(singularity instance list --logs)"
+  if [[ $info =~ $regex ]]; then
+    local src="${BASH_REMATCH[1]}"
+    if [[ -f $src ]]; then
+      local dest="<%= session.staged_root %>/$(basename "$src")"
+      echo "Tailing '$src' to '$dest'"
+      tail -n +1 -F "$src" > "$dest" &
+      return
+    fi
+  fi
+  echo "⚠️  WARNING: Could not find singularity instance logfile matching '$regex'"
+}
+
+
+# Wait for Ollama to start
+echo "Waiting for Ollama server to open port ${OLLAMA_PORT}..."
+echo "TIMING - Starting wait at: $(date)"
+
+# Optional: wait extra time for initialization
+sleep 5
+
+# Debugging info
+module list
+
+# Launch Jupyter
+echo "TIMING - Starting Jupyter at: $(date)"
+
+if [[ -z "${CONFIG_FILE}" ]]; then
+  echo "❌ Error: CONFIG_FILE is not set"
+  exit 1
+fi
+
+export JUPYTER_PATH="/cluster/tufts/hpc/tools/miniforge3/envs/kernels/public"
+
+jupyter notebook --config="${CONFIG_FILE}" 

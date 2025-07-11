@@ -1,0 +1,101 @@
+---
+
+cluster: "pax"
+bc_dynamic_js: true
+
+attributes:
+  conda_extensions: "0"
+  num_cores:
+    widget: "number_field"
+    label: "Number of cores"
+    value: 1
+    min: 1
+    max: 128
+    step: 1
+
+  num_cores:
+    widget: "select"
+    label: "Cores"
+    options:
+      - ["2", "2"]
+      - ["4", "4"]
+      - ["8", "8"]
+      - ["12", "12"]
+      - ["16", "16"]
+
+  num_memory:
+    widget: "select"
+    label: "Amount of memory"
+    options:
+      - ["16GB", "16000"]
+      - ["24GB", "24000"]
+      - ["32GB", "32000"]
+      - ["64GB", "64000"]
+      - ["96GB", "96000"]   
+      - ["480GB", "480000"]  
+
+  version:
+    label: Version
+    widget: select
+    options:
+            - ["0.6.4"]
+
+  gpu_type:
+    widget: "select"
+    label: "GPU type"
+    help: "gpu partition has a100, a100-80GB and p100, preempt partition has all listed gpu types."
+    options:
+      - ["any"]
+      - ["a100"]
+      - ["a100-80GB"]
+      - ["l40"]
+      - ["rtx_a5000"] 
+      - ["rtx_a6000"]
+      - ["rtx_6000ada"]
+    value: "a100"
+
+  gpu_partition:
+    widget: "select"
+    label: "Select preempt or normal gpu partition"
+    help: "NOTE: jobs submitted to the preempt partition may get automatically killed to allow higher priority jobs to run"
+    options:
+      - ["preempt", "preempt"]
+      - ["gpu", "gpu"]
+      - ["pettilab", "pettilab"]
+      - ["linlab", "linlab"]
+      - ["liulab", "liulab"]
+      - ["patralab", "patralab"]
+      - ["hugheslab", "hugheslab"]
+      - ["laolab", "laolab"]
+    value: "gpu"
+
+  working_directory:
+    widget: path_selector
+    label: "Top Working Directory"
+    directory: /cluster/home
+    favorites:
+         - /cluster/tufts
+         - /cluster/home
+
+  modeldir:
+    label: Model directory
+    widget: path_selector
+    value: "/cluster/tufts/hpc/tools/ollama/models"
+    directory: /cluster/tufts
+    favorites:
+      - /cluster/tufts
+      - /cluster/home
+    help: |
+          A selection of commonly used models are available at `/cluster/tufts/hpc/tools/ollama/models` (managed by Research Technology).
+          You may also provide your own model path if preferred.
+
+form:
+  - conda_extensions
+  - bc_num_hours
+  - num_cores
+  - num_memory
+  - version
+  - gpu_partition
+  - gpu_type
+  - working_directory
+  - modeldir
