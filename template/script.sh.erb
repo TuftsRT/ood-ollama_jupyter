@@ -23,8 +23,9 @@ fi
 
 # Load modules
 module purge
-module load miniforge/24.7.1-py312
-module load singularity
+module load miniforge
+module load apptainer
+module load jupyter
 
 # Find and export Ollama port
 OLLAMA_PORT=$(find_port)
