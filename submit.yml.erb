@@ -7,6 +7,7 @@ script:
   email_on_started: true
   email_on_terminated: true
   email: <%= ENV["USER"] %>@tufts.edu
+  job_name: "OnDemand/ollama-jupyter"
   before_script: "before.sh.erb"
   script: "script.sh.erb"
 
