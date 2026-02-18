@@ -33,7 +33,17 @@ attributes:
           A selection of commonly used models are available at `/cluster/tufts/hpc/tools/ollama/models` (managed by Research Technology).
           You may also provide your own model path if preferred.
 
+  disclaimer_block:
+    widget: text_field
+    class: "d-none"
+    skip_label: true
+<% if File.exist?("/etc/ood/config/apps/dashboard/batch_connect/partials/ai_disclaimer.md")  %>
+    help: |
+<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/ai_disclaimer.md").indent(11) %>
+<%end%>
+
 form:
+  - disclaimer_block
   - conda_extensions
   - bc_num_hours
   - num_cores
