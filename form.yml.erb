@@ -1,3 +1,11 @@
+<%
+  show_qos = false
+  qos_options = (`sacctmgr show assoc where user=#{ENV['USER']} format=qos%1000 --noheader --parsable2 `).split(",")
+
+  if qos_options.include?("interactive")
+    show_qos = true
+  end
+%>
 ---
 
 cluster: "pax"
@@ -33,6 +41,13 @@ attributes:
           A selection of commonly used models are available at `/cluster/tufts/hpc/tools/ollama/models` (managed by Research Technology).
           You may also provide your own model path if preferred.
 
+  ta_qos:
+    widget: check_box
+    label: "Request priority start"
+    help: "Limited to 1 running job at a time. (--qos=interactive)"
+    value: "interactive"
+    checked_value: "interactive"
+    unchecked_value: "normal"
   disclaimer_block:
     widget: text_field
     class: "d-none"
@@ -50,6 +65,9 @@ form:
   - num_memory
   - version
   - partition
+<% if show_qos  %>
+  - ta_qos
+<%end%>
   - gpu_type
   - working_directory
   - modeldir
