@@ -1,11 +1,10 @@
+---
 batch_connect:
   template: "basic"
   conn_params:
     - working_path
 
 script:
-  email_on_started: true
-  email_on_terminated: true
   email: <%= ENV["USER"] %>@tufts.edu
   job_name: "OnDemand/ollama-jupyter"
   before_script: "before.sh.erb"
@@ -16,17 +15,20 @@ script:
     - "--cpus-per-task=<%= num_cores %>"
     - "--mem=<%= num_memory %>G"
     - "--nodes=1"
-    - "-p <%= partition %>"
+    - "--partition=<%= partition %>"
 <%
-  skip_gres = gpu_type == "none" || ["batch", "largemem", "rc2", "pangolinlab", "ruiguolab", "shushkovlab", "vaseylab"].include?(partition)
+  # gpu_type values come from the ai_tools.yml partial
+  skip_gres = !defined?(gpu_type) || gpu_type.to_s == "none"
 %>
 <% unless skip_gres %>
-  <% if gpu_type == "a100_40" %>
+  <% if gpu_type == "a100" %>
     - "--gres=gpu:a100:1"
     - "--constraint=a100-40G"
-  <% elsif gpu_type == "a100_80" %>
+  <% elsif gpu_type == "a100-80GB" %>
     - "--gres=gpu:a100:1"
     - "--constraint=a100-80G"
+  <% elsif gpu_type == "rtx_6000ada" %>
+    - "--gres=gpu:rtx_6000_ada:1"
   <% elsif gpu_type == "any" %>
     - "--gres=gpu:1"
   <% else %>
