@@ -17,22 +17,16 @@ script:
     - "--nodes=1"
     - "--partition=<%= partition %>"
 <%
-  # gpu_type values come from the ai_tools.yml partial
-  skip_gres = !defined?(gpu_type) || gpu_type.to_s == "none"
+  # gpu_type from resource_discovery.erb is a feature variant like "a100-40G".
+  # The gres name is the part before the first "-"; the full variant is a
+  # node constraint. Empty/"none" (CPU partitions) => no GPU request.
+  gres_name = gpu_type.to_s.split('-', 2).first.to_s
+  skip_gres = gres_name.empty? || gres_name == "none"
 %>
 <% unless skip_gres %>
-  <% if gpu_type == "a100" %>
-    - "--gres=gpu:a100:1"
-    - "--constraint=a100-40G"
-  <% elsif gpu_type == "a100-80GB" %>
-    - "--gres=gpu:a100:1"
-    - "--constraint=a100-80G"
-  <% elsif gpu_type == "rtx_6000ada" %>
-    - "--gres=gpu:rtx_6000_ada:1"
-  <% elsif gpu_type == "any" %>
-    - "--gres=gpu:1"
-  <% else %>
-    - "--gres=gpu:<%= gpu_type %>:1"
+    - "--gres=gpu:<%= gres_name %>:1"
+  <% if gpu_type.include?('-') %>
+    - "--constraint=<%= gpu_type %>"
   <% end %>
 <% end %>
     <%- if defined?(ta_qos) && ta_qos == "interactive" -%>

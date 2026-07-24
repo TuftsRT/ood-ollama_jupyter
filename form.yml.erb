@@ -1,11 +1,31 @@
 ---
+<%
+@partition_filter = :gpu
+_partial_path = '/etc/ood/config/apps/dashboard/batch_connect/partials/resource_discovery.erb'
+ERB.new(File.read(_partial_path)).result(binding)
+%>
 
 cluster: "pax"
 bc_dynamic_js: true
 
 attributes:
   conda_extensions: "0"
-<%= File.read("/etc/ood/config/apps/dashboard/batch_connect/partials/ai_tools.yml").indent(2) %>
+
+<%= generate_partition_field.indent(2) %>
+<%= generate_gpu_type_field.indent(2) %>
+<%= generate_num_cores_field(
+      extra_help: "As a rule of thumb, scale this with the size of the LLM you plan to run: " \
+                  "larger models benefit from more cores for data loading and tokenization. " \
+                  "If you are unsure, the default above is a reasonable starting point.",
+      default_value: 8
+    ).indent(2) %>
+<%= generate_num_memory_field(
+      extra_help: "A simple starting point is roughly double your selected core count, in GB " \
+                  "(for example, 8 cores suggests about 16GB memory). Larger models need " \
+                  "proportionally more.",
+      default_value: 32
+    ).indent(2) %>
+<%= generate_num_hours_field.indent(2) %>
 
   version:
     label: Version
@@ -47,6 +67,14 @@ attributes:
     value: "normal"
     checked_value: "interactive"
     unchecked_value: "normal"
+
+  docs_link_block:
+    widget: text_field
+    class: "d-none"
+    skip_label: true
+    help: |
+      For full documentation on this tool, see the [AI Tools guide](https://go.tufts.edu/AITools).
+
   disclaimer_block:
     widget: text_field
     class: "d-none"
@@ -57,13 +85,14 @@ attributes:
 <%end%>
 
 form:
+  - docs_link_block
   - disclaimer_block
   - conda_extensions
+  - partition
   - bc_num_hours
   - num_cores
   - num_memory
   - version
-  - partition
   - gpu_type
   - working_directory
   - modeldir

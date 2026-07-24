@@ -4,4 +4,6 @@ category: Interactive Apps
 subcategory: AI
 role: batch_connect
 description: |
-  LLM Notebooks combine open-source LLMs with a Jupyter-based environment, enabling users to build intelligent workflows, prototype AI-driven agents, and integrate generative models into data analysis and course work. Ideal for those who want flexibility and control through a code-first approach. This tool is not meant for personal use.
+  LLM Notebooks combines open-source large language models with a Jupyter-based Python environment on Tufts HPC, letting you build intelligent workflows, prototype AI-driven agents, and integrate generative models into data analysis and coursework. Built on [Ollama](https://ollama.com/) and [Jupyter Notebook].
+
+  [Jupyter Notebook]: https://jupyter.org/
